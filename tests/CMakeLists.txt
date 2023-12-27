@@ -11,12 +11,9 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKEr_FLAGS} -fsanitize=address")
 # Add List Tester
 #################
 
-add_executable(LinkedListTester test_list.c)
-target_include_directories(LinkedListTester PUBLIC "${PROJECT_SOURCE_DIR}/src/")
-target_link_libraries(LinkedListTester list_lib utils_test utils_lib)
-#set_target_properties(LinkedListTester PROPERTIES COMPILE_FLAGS "")
+add_executable(ll_tester test_list.c)
+target_include_directories(ll_tester PUBLIC "${PROJECT_SOURCE_DIR}/src/")
+target_link_libraries(ll_tester list_lib utils_test utils_lib)
 
 # List test cases
-add_test(NAME LinkedListTester0 COMMAND LinkedListTester 0)
-add_test(NAME LinkedListTester1 COMMAND LinkedListTester 1)
-add_test(NAME LinkedListTester2 COMMAND LinkedListTester 2)
+add_test(NAME ll_tester_case_0 COMMAND ll_tester 0)

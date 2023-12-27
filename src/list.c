@@ -143,6 +143,9 @@ ll_node_uint32_t* ll_del_value_uint32_t(ll_node_uint32_t* head, const int value)
 
 /**
  * @brief: Pops the last node and returns its value
+ *
+ * TODO pop method is still a bit inaccurate, since it doesn't handle the case
+ *      where head is the only value left.
  */
 Result_uint32_t ll_pop_value_uint32_t(ll_node_uint32_t* head)
 {
