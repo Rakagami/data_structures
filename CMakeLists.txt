@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.21)
 enable_testing()
 
 project(
@@ -7,6 +7,10 @@ project(
     DESCRIPTION "Data Structures in C"
     LANGUAGES C
     )
+
+# For blazingly modern C!!
+set(CMAKE_C_STANDARD 23)
+set(CMAKE_C_STANDARD_REQUIRED On)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
