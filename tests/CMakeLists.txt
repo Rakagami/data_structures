@@ -17,3 +17,4 @@ target_link_libraries(ll_tester list_lib utils_test utils_lib)
 
 # List test cases
 add_test(NAME ll_tester_case_0 COMMAND ll_tester 0)
+add_test(NAME ll_tester_case_1 COMMAND ll_tester 1)
