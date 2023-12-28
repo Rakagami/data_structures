@@ -1,5 +1,8 @@
 # Data Structures in C
 
+A little side project of mine of basically a cookbook of different data structures
+implemented in C with C23.
+
 ## Quick-Start
 
 You can compile everything like this:
@@ -15,4 +18,5 @@ make
 
 ## Test Setup
 
-Currently, the tests are very basic.
+Tests are currently implemented manually with cmake. You can run the tests with `make test`.
+You can also find the test binaries under `build/tests/`.

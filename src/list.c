@@ -2,7 +2,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 //--------------------------------------------------
 // Helper functions
@@ -39,14 +38,15 @@ static ll_node_uint32_t* _get_node_by_idx(ll_node_uint32_t* head, size_t idx, co
  * @brief Gets linked list node by first node appearance
  *
  * @details The lookback value is important since we use a single-linked list. If the lookback is 0,
- *          then the node returned is exactly of the first appearance of value. If it's 1, then it 
+ *          then the node returned is exactly of the first appearance of value. If it's 1, then it
  *          actually only returns the lookback-th node before the first appearance of value.
  *
  * @param head Head of the linked list
  * @param idx Index of node we want to get
  * @param lookback Number of nodes to look back.
  */
-static ll_node_uint32_t* _find_node_by_value(ll_node_uint32_t* head, const uint32_t value, size_t lookback)
+static ll_node_uint32_t* _find_node_by_value(
+    ll_node_uint32_t* head, const uint32_t value, size_t lookback)
 {
     ll_node_uint32_t* cur = head;
     ll_node_uint32_t* lookback_node = head;
@@ -71,118 +71,96 @@ static ll_node_uint32_t* _find_node_by_value(ll_node_uint32_t* head, const uint3
 /**
  * @brief: A new list is just the nullptr pointer
  */
-ll_node_uint32_t* ll_new_list_uint32_t()
+ll_uint32_t ll_new_list_uint32_t()
 {
-    return nullptr;
+    return (ll_uint32_t) {
+        .head = nullptr,
+        .tail = nullptr,
+    };
+}
+
+/**
+ * @brief: Appends the value to the end of the list
+ */
+bool ll_add_value_uint32_t(ll_uint32_t* list, const int value)
+{
+    ll_node_uint32_t* new_node = malloc(sizeof(ll_node_uint32_t));
+    *new_node = (ll_node_uint32_t) {
+        .value = value,
+        .next = nullptr,
+    };
+
+    if (list->head == nullptr) {
+        list->head = new_node;
+        list->tail = new_node;
+        return true;
+    } else {
+        ll_node_uint32_t* last_node = list->tail;
+        last_node->next = new_node;
+        list->tail = new_node;
+        return true;
+    }
 }
 
 /**
  * @brief: Delete the entire list
- *
- * @details: This basically does the same thing as clear, why did I do this? idk
  */
-bool ll_del_list_uint32_t(ll_node_uint32_t* head)
+bool ll_clear_list_uint32_t(ll_uint32_t* list)
 {
-    ll_node_uint32_t* cur = head;
+    ll_node_uint32_t* cur = list->head;
     ll_node_uint32_t* next;
     while (cur != nullptr) {
         next = cur->next;
         free(cur);
         cur = next;
     }
+    list->head = nullptr;
+    list->tail = nullptr;
     return true;
-}
-
-/**
- * @brief: Appends the value to the end of the list
- */
-ll_node_uint32_t* ll_add_value_uint32_t(ll_node_uint32_t* head, const int value)
-{
-    ll_node_uint32_t* new_node = malloc(sizeof(ll_node_uint32_t));
-    memset(new_node, 0, sizeof(ll_node_uint32_t));
-    new_node->value = value;
-    new_node->next = nullptr;
-
-    if (head == nullptr) {
-        return new_node;
-    } else {
-        ll_node_uint32_t* cur = head;
-        while (cur->next != nullptr)
-            cur = cur->next;
-        cur->next = new_node;
-        return head;
-    }
 }
 
 /**
  * @brief: Deletes the first appearance of the value
  */
-ll_node_uint32_t* ll_del_value_uint32_t(ll_node_uint32_t* head, const int value)
+bool ll_del_value_uint32_t(ll_uint32_t* list, const int value)
 {
-    if (head == nullptr) {
-        return nullptr;
-    } else if (head->value == value) {
-        uint32_t tmp = head->value;
-        free(head);
-        return nullptr;
+    if (list->head == nullptr) {
+        return false;
+    } else if (list->head->value == value) {
+        uint32_t tmp = list->head->value;
+        free(list->head);
+        list->head = nullptr;
+        return true;
     }
 
-    ll_node_uint32_t * node = _find_node_by_value(head, value, 1);
+    ll_node_uint32_t* node = _find_node_by_value(list->head, value, 1);
     if (node == nullptr) {
-        return head;
+        return false;
     } else if (node->next == nullptr) { // this case shouldn't occur
-        return head;
+        return false;
     }
 
-    ll_node_uint32_t * after = node->next->next;
+    ll_node_uint32_t* after = node->next->next;
     free(node->next);
     node->next = after;
 
-    return head;
-}
-
-/**
- * @brief: Pops the last node and returns its value
- *
- * TODO pop method is still a bit inaccurate, since it doesn't handle the case
- *      where head is the only value left.
- */
-Result_uint32_t ll_pop_value_uint32_t(ll_node_uint32_t* head)
-{
-    if (head == nullptr) {
-        return Result_uint32_t_Err("Trying to pop from empty list");
-    } else if (head->next == nullptr) {
-        uint32_t value = head->value;
-        free(head);
-        return Result_uint32_t_Ok(value);
-    } else {
-        ll_node_uint32_t* cur = head;
-        ll_node_uint32_t* next = head->next;
-        while (next->next != nullptr) {
-            cur = cur->next;
-            next = next->next;
-        }
-        uint32_t value = next->value;
-        cur->next = nullptr;
-        free(next);
-        return Result_uint32_t_Ok(value);
-    }
+    return true;
 }
 
 /**
  * @brief: Returns whether or not the list is empty
  */
-bool ll_is_empty_uint32_t(ll_node_uint32_t* head)
+bool ll_is_empty_uint32_t(ll_uint32_t* list)
 {
-    return head == nullptr;
+    return list->head == nullptr || list->tail == nullptr;
 }
 
 /**
  * @brief: Returns length of the list
  */
-size_t ll_length_uint32_t(ll_node_uint32_t* head)
+size_t ll_length_uint32_t(ll_uint32_t* list)
 {
-    ll_node_uint32_t* cur = head;
+    ll_node_uint32_t* cur = list->head;
     size_t cnt = 0;
     while (cur != nullptr) {
         cur = cur->next;
@@ -192,32 +170,16 @@ size_t ll_length_uint32_t(ll_node_uint32_t* head)
 }
 
 /**
- * @brief: Clears the list
- */
-ll_node_uint32_t* ll_clear_uint32_t(ll_node_uint32_t* head)
-{
-    if (ll_del_list_uint32_t(head)) {
-        return nullptr;
-    } else {
-        // Something went wrong in this case.
-        return head;
-    }
-}
-
-/**
  * @brief: Sets the value at index idx to value
  */
-bool ll_set_uint32_t(ll_node_uint32_t* head, const int idx, const int value)
+bool ll_set_uint32_t(ll_uint32_t* list, const int idx, const int value)
 {
-    size_t len = ll_length_uint32_t(head);
+    size_t len = ll_length_uint32_t(list);
     if (idx < 0 || idx >= len) {
         return false;
-    } else if (idx == 0 && head != nullptr) {
-        head->value = value;
-        return true;
     }
 
-    ll_node_uint32_t * node = _get_node_by_idx(head, idx, 0);
+    ll_node_uint32_t* node = _get_node_by_idx(list->head, idx, 0);
     if (node == nullptr) {
         return false;
     }
@@ -229,31 +191,58 @@ bool ll_set_uint32_t(ll_node_uint32_t* head, const int idx, const int value)
 /**
  * @brief: Gets value at index idx
  */
-Result_uint32_t ll_get_uint32_t(ll_node_uint32_t* head, const int idx)
+Result_uint32_t ll_get_uint32_t(ll_uint32_t* list, const int idx)
 {
-    size_t len = ll_length_uint32_t(head);
+    size_t len = ll_length_uint32_t(list);
     if (idx < 0 || idx >= len) {
         return Result_uint32_t_Err("Out of range");
     }
 
-    for (size_t i = 0; i < len; i++) {
-        if (head == nullptr) {
-            return Result_uint32_t_Err("Unexpected nullptr node");
-        } else if (i == idx) {
-            return Result_uint32_t_Ok(head->value);
-        } else {
-            head = head->next;
-        }
-    }
+    ll_node_uint32_t* node = _get_node_by_idx(list->head, idx, 0);
 
-    return Result_uint32_t_Ok(0);
+    if (node == nullptr) {
+        return Result_uint32_t_Err("Some error occured");
+    } else {
+        return Result_uint32_t_Ok(node->value);
+    }
 }
 
-void ll_print_uint32_t(ll_node_uint32_t* head)
+/**
+ * @brief: Pops the last node and returns its value
+ */
+Result_uint32_t ll_pop_value_uint32_t(ll_uint32_t* list)
+{
+    if (list->head == nullptr || list->tail == nullptr) { // Empty
+        return Result_uint32_t_Err("Trying to pop from empty list");
+    } else if (list->head == list->tail || list->head->next == nullptr) { // Only one element
+        uint32_t value = list->head->value;
+        free(list->head);
+        list->head = nullptr;
+        list->tail = nullptr;
+        return Result_uint32_t_Ok(value);
+    } else { // More than one element
+        ll_node_uint32_t* cur = list->head;
+        ll_node_uint32_t* next = list->head->next;
+        while (next->next != nullptr) {
+            cur = cur->next;
+            next = next->next;
+        }
+        uint32_t value = next->value;
+        free(next);
+        cur->next = nullptr;
+        list->tail = cur;
+        return Result_uint32_t_Ok(value);
+    }
+}
+
+/**
+ * @brief: Gets value at index idx
+ */
+void ll_print_uint32_t(ll_uint32_t* list)
 {
     printf("[");
 
-    ll_node_uint32_t* cur = head;
+    ll_node_uint32_t* cur = list->head;
     while (cur != nullptr) {
         printf("%i", cur->value);
         if (cur->next != nullptr)
