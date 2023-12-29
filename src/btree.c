@@ -125,26 +125,65 @@ static void _free_node(bt_node_uint32_t* node)
 bool bt_clear_uint32_t(bt_uint32_t* tree)
 {
     _traverse_tree(tree->root, _free_node, 2);
+    tree->root = nullptr;
     return true;
 }
 
-size_t bt_size_uint32_t(bt_uint32_t* list)
+/**
+ * @brief Counts size of tree
+ */
+static size_t _size_count = 0;
+static void _count_nodes(bt_node_uint32_t* node)
 {
-    return 0;
+    _size_count++;
+}
+size_t bt_size_uint32_t(bt_uint32_t* tree)
+{
+    _size_count = 0;
+    _traverse_tree(tree->root, _count_nodes, 2);
+    return _size_count;
 }
 
 /**
  * @brief Prints binary tree
- * TODO
  */
 static void _print_node(bt_node_uint32_t* node)
 {
     printf("%d ", node->value);
 }
+static void _print_tree_consume(
+    bt_node_uint32_t* node, const int depth, const int ldepth, bool left_child)
+{
+    for (int i = 0; i < depth - 1; i++) {
+        printf("%s   ", (i < (depth - ldepth)) ? " " : "│");
+    }
+    if (depth > 0) {
+        printf("%s─%s ", left_child ? "├" : "└", left_child ? "L" : "R");
+    }
+    if (node == nullptr) {
+        printf("nil\n");
+    } else {
+        printf("%d\n", node->value);
+    }
+}
+static void _print_tree_traverse(
+    bt_node_uint32_t* node, const int depth, const int ldepth, bool left_child)
+{
+    _print_tree_consume(node, depth, ldepth, left_child);
+    if (node == nullptr)
+        return;
+    int new_ldepth = left_child ? ldepth + 1 : ldepth;
+    _print_tree_traverse(node->left, depth + 1, new_ldepth, true);
+    _print_tree_traverse(node->right, depth + 1, new_ldepth, false);
+}
 void bt_print_uint32_t(bt_uint32_t* tree)
 {
+    printf("------------------------------\n");
     printf("As list:\n");
     printf("[");
     _traverse_tree(tree->root, _print_node, 1);
     printf("]\n");
+    printf("As tree:\n");
+    _print_tree_traverse(tree->root, 0, 0, true);
+    printf("------------------------------\n");
 }
