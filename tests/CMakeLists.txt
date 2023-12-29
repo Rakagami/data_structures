@@ -29,3 +29,4 @@ target_link_libraries(bt_tester btree_lib utils_test utils_lib)
 
 # List test cases
 add_test(NAME bt_tester_case_0 COMMAND bt_tester 0)
+add_test(NAME bt_tester_case_1 COMMAND bt_tester 1)
